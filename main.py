@@ -35,4 +35,5 @@ def action():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=80)
+    app.run(host="0.0.0.0", port=443, ssl_context=("/etc/letsencrypt/live/ahre.cloud/fullchain.pem", "/etc/letsencrypt/live/ahre.cloud/privkey.pem"))
+    # app.run(host="0.0.0.0", port=80)
