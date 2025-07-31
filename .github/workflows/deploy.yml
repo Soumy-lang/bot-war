@@ -31,8 +31,6 @@ jobs:
     - name: Run tests
       run: |
         python -m pytest test_api.py -v
-      env:
-      
 
   build-and-deploy:
     needs: test
