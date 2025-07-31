@@ -3,31 +3,31 @@ from bot.decision import decide_action, get_bomb_type
 
 app = Flask(__name__)
 
-@app.route('/action', methods=['POST'])
+@app.route('/action', methods=['GET', 'POST'])
 def action():
-    """
-    Endpoint principal pour les décisions du bot.
-    
-    Accepte un état de jeu JSON et retourne :
-    - move : Direction de mouvement (UP, DOWN, LEFT, RIGHT, STAY)
-    - action : Type d'action (COLLECT, ATTACK, BOMB, NONE)
-    - bombType : Type de bombe si action=BOMB (proximity, timer, static)
-    """
-    game_state = request.get_json(force=True)
+    if request.method == 'POST':
+        game_state = request.get_json(force=True)
+    else:
+        # Si appelé en GET sans body, retourne un état fictif
+        game_state = {
+            "player": {"position": [5, 5], "score": 10},
+            "map": {"width": 10, "height": 10, "center": [5, 5], "objects": []},
+            "enemies": [],
+            "bombs": []
+        }
+
     move, action = decide_action(game_state)
-    
+
     response = {
         "move": move,
         "action": action
     }
-    
-    # Ajouter le type de bombe si l'action est BOMB
+
     if action == "BOMB":
-        player_pos = game_state["player"]["position"]
-        bomb_type = get_bomb_type(game_state, player_pos)
+        bomb_type = get_bomb_type(game_state, game_state["player"]["position"])
         response["bombType"] = bomb_type
-    
+
     return jsonify(response)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host="0.0.0.0", port=5000)

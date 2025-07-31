@@ -13,8 +13,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier le code source
 COPY . .
 
-# Exposer le port 80
-EXPOSE 80
+# Exposer le port 5000
+EXPOSE 5000
 
 # Commande par défaut pour démarrer l'application
 CMD ["python", "main.py"]

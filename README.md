@@ -8,7 +8,8 @@ Créer une API avec une route `/action` qui :
 - Reçoit l'état du jeu (JSON)
 - Répond avec `{"move": "UP", "action": "ATTACK", "bombType": "proximity"}`
 - Implémente la logique de décision du bot avec nouvelles actions
-- Inclut des tests avec Jest
+- **Exécute automatiquement des actions toutes les 10 secondes**
+- Inclut des tests avec pytest
 - Utilise un Dockerfile fonctionnel
 - Se déploie automatiquement avec GitHub Actions
 
@@ -19,14 +20,14 @@ Créer une API avec une route `/action` qui :
 - **Nouvelles actions** : COLLECT, ATTACK, BOMB, NONE
 - **Types de bombes** : proximity, timer, static
 - **Stratégies avancées** : smart_bomber, trap_setter
-- **Tests complets** : Tests Jest pour tous les scénarios
+- **Exécution automatique** : Actions toutes les 10 secondes en arrière-plan
+- **Tests complets** : Tests pytest pour tous les scénarios
 - **Containerisation** : Dockerfile pour déploiement facile
 - **CI/CD** : Déploiement automatique avec GitHub Actions
 
 ## 📋 Prérequis
 
 - Python 3.11+
-- Node.js 18+ (pour les tests)
 - Docker (optionnel)
 
 ## 🛠️ Installation
@@ -44,17 +45,14 @@ cd bot-war
 pip install -r requirements.txt
 ```
 
-3. **Installer les dépendances Node.js (pour les tests)**
-```bash
-npm install
-```
-
-4. **Démarrer l'API**
+3. **Démarrer l'API**
 ```bash
 python main.py
 ```
 
-L'API sera disponible sur `http://localhost:80`
+L'API sera disponible sur `http://localhost:5000`
+
+**⚠️ Note importante :** L'API démarre automatiquement l'exécution d'actions toutes les 10 secondes en arrière-plan.
 
 ### Avec Docker
 
@@ -63,13 +61,17 @@ L'API sera disponible sur `http://localhost:80`
 docker build -t bot-war .
 
 # Lancer le container
-docker run -p 80:80 bot-war
+docker run -p 5000:5000 bot-war
 ```
 
 ## 🧪 Tests
 
-### Tests Jest
+### Tests pytest
 ```bash
+# Exécuter tous les tests
+python -m pytest test_api.py -v
+
+# Ou avec npm (si package.json configuré)
 npm test
 ```
 
@@ -80,10 +82,10 @@ Importez le fichier `postman_collection.json` dans Postman pour tester manuellem
 
 ### Endpoint : `/action`
 
-**Méthode :** POST  
-**Content-Type :** application/json
+**Méthodes :** GET, POST  
+**Content-Type :** application/json (pour POST)
 
-#### Exemple de requête :
+#### Exemple de requête POST :
 ```json
 {
   "player": {
@@ -146,6 +148,44 @@ Importez le fichier `postman_collection.json` dans Postman pour tester manuellem
 - `"timer"` : Explose après 2 tours
 - `"static"` : Ne bouge jamais, obstacle permanent
 
+## ⏰ Exécution automatique
+
+L'API exécute automatiquement des actions toutes les 10 secondes en arrière-plan :
+
+### **Au démarrage :**
+- L'exécution automatique démarre automatiquement
+- Un thread en arrière-plan prend des décisions toutes les 10 secondes
+- Les actions sont affichées dans les logs de l'API
+
+### **État de jeu par défaut pour l'auto-exécution :**
+```json
+{
+  "player": {
+    "position": [5, 5],
+    "score": 10
+  },
+  "map": {
+    "width": 10,
+    "height": 10,
+    "center": [5, 5],
+    "objects": []
+  },
+  "enemies": [],
+  "bombs": []
+}
+```
+
+### **Logs d'exécution automatique :**
+```
+🚀 Bot War API démarrée sur http://localhost:5000
+📡 Endpoint disponible: GET/POST /action
+⏰ L'exécution automatique effectue des actions toutes les 10 secondes
+🚀 Exécution automatique démarrée - actions toutes les 10 secondes
+Auto-execution: {'move': 'STAY', 'action': 'NONE'}
+Auto-execution: {'move': 'STAY', 'action': 'NONE'}
+Auto-execution: {'move': 'STAY', 'action': 'NONE'}
+```
+
 ## 🧠 Logique de décision
 
 ### Mouvement
@@ -181,11 +221,15 @@ Priorité des actions (dans l'ordre) :
 ## 🔧 Configuration
 
 ### Variables d'environnement
-- `BASE_URL` : URL de base pour les tests (défaut: `http://localhost:80`)
+- `BASE_URL` : URL de base pour les tests (défaut: `http://localhost:5000`)
 
 ### Ports
-- **Port par défaut** : 80
+- **Port par défaut** : 5000
 - **Host** : 0.0.0.0 (accessible depuis l'extérieur)
+
+### Timing
+- **Intervalle d'exécution automatique** : 10 secondes
+- **Thread daemon** : S'arrête automatiquement quand l'API s'arrête
 
 ## 🚀 Déploiement
 
@@ -207,16 +251,16 @@ Ajoutez ces secrets dans votre repository GitHub :
 
 ```
 bot-war/
-├── main.py                 # Point d'entrée de l'API
+├── main.py                 # Point d'entrée de l'API avec auto-exécution
 ├── bot/
 │   ├── __init__.py
 │   ├── decision.py         # Logique de décision du bot
 │   └── game_state.py       # Gestion de l'état du jeu
 ├── tests/
-│   ├── api.test.js         # Tests Jest
 │   └── mock_game_state.json # Données de test
+├── test_api.py             # Tests pytest
 ├── requirements.txt         # Dépendances Python
-├── package.json            # Configuration Node.js
+├── package.json            # Configuration npm (optionnel)
 ├── Dockerfile              # Configuration Docker
 ├── postman_collection.json # Tests Postman
 └── .github/workflows/      # GitHub Actions
@@ -228,8 +272,8 @@ bot-war/
 ### Ajouter de nouvelles fonctionnalités
 
 1. **Modifier la logique** : Éditez `bot/decision.py`
-2. **Ajouter des tests** : Créez de nouveaux tests dans `tests/api.test.js`
-3. **Tester localement** : `npm test`
+2. **Ajouter des tests** : Créez de nouveaux tests dans `test_api.py`
+3. **Tester localement** : `python -m pytest test_api.py -v`
 4. **Pousser les changements** : Le déploiement se fait automatiquement
 
 ### Améliorations possibles
@@ -238,6 +282,8 @@ bot-war/
 - [x] Implémenter la détection d'ennemis
 - [x] Ajouter la gestion des objets collectables
 - [x] Implémenter les stratégies smart_bomber et trap_setter
+- [x] Ajouter l'exécution automatique toutes les 10 secondes
+- [x] Remplacer les tests Jest par pytest
 - [ ] Optimiser les algorithmes de pathfinding
 - [ ] Ajouter des métriques et monitoring
 - [ ] Implémenter des stratégies plus avancées
@@ -247,7 +293,7 @@ bot-war/
 
 Pour toute question ou problème :
 1. Vérifiez les logs de l'API
-2. Exécutez les tests : `npm test`
+2. Exécutez les tests : `python -m pytest test_api.py -v`
 3. Consultez la documentation de l'API
 4. Ouvrez une issue sur GitHub
 

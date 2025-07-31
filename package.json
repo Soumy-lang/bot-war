@@ -4,16 +4,7 @@
   "description": "API pour le jeu Bot War",
   "main": "main.py",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "python -m pytest test_api.py -v",
     "start": "python main.py"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0",
-    "axios": "^1.7.9"
-  },
-  "jest": {
-    "testEnvironment": "node",
-    "testTimeout": 10000
   }
 } 
