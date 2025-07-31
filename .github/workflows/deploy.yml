@@ -71,3 +71,33 @@ jobs:
       run: |
         echo "Deployment completed!"
         echo "Your API is available at: https://your-deployment-url.com"
+
+    ssh-deploy:
+    needs: build-and-deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Copy files to VPS via SSH
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        source: "."
+        target: "~/bot-war-api"
+
+    - name: Execute remote deployment script
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd ~/bot-war-api
+          docker stop bot-war || true && docker rm bot-war || true
+          docker rmi ${{ secrets.DOCKER_USERNAME }}/bot-war:latest || true
+          docker pull ${{ secrets.DOCKER_USERNAME }}/bot-war:latest
+          docker run -d -p 80:80 --name bot-war ${{ secrets.DOCKER_USERNAME }}/bot-war:latest
