@@ -32,7 +32,7 @@ jobs:
       run: |
         python -m pytest test_api.py -v
       env:
-        BASE_URL: http://51.68.198.212:5000/
+      
 
   build-and-deploy:
     needs: test
