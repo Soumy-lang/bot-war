@@ -9,33 +9,33 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-    
+
     - name: Start API server
       run: |
         python main.py &
         sleep 5
-    
+
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-    
+
     - name: Install Node.js dependencies
       run: npm install
-    
+
     - name: Run tests
       run: npm test
       env:
@@ -45,19 +45,19 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v4
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    
+
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
@@ -66,13 +66,12 @@ jobs:
         tags: ${{ secrets.DOCKER_USERNAME }}/bot-war:latest
         cache-from: type=gha
         cache-to: type=gha,mode=max
-    
-    - name: Deploy to production
-      run: |
-        echo "Deployment completed!"
-        echo "Your API is available at: https://your-deployment-url.com"
 
-    ssh-deploy:
+    - name: Deploy to production (placeholder)
+      run: |
+        echo "Image pushed to Docker Hub. Proceeding to SSH deployment."
+
+  ssh-deploy:
     needs: build-and-deploy
     runs-on: ubuntu-latest
 
