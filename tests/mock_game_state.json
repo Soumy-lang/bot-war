@@ -1,0 +1,13 @@
+{
+    "player": {
+      "position": [2, 3],
+      "score": 5
+    },
+    "map": {
+      "width": 10,
+      "height": 10,
+      "center": [5, 5],
+      "objects": []
+    }
+  }
+  
