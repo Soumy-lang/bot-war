@@ -7,8 +7,12 @@ app = Flask(__name__)
 def action():
     if request.method == 'POST':
         game_state = request.get_json(force=True)
+
+        # Garantir les clés attendues
+        game_state.setdefault("enemies", [])
+        game_state.setdefault("bombs", [])
+        game_state.setdefault("map", {}).setdefault("objects", [])
     else:
-        # Si appelé en GET sans body, retourne un état fictif
         game_state = {
             "player": {"position": [5, 5], "score": 10},
             "map": {"width": 10, "height": 10, "center": [5, 5], "objects": []},
@@ -28,6 +32,7 @@ def action():
         response["bombType"] = bomb_type
 
     return jsonify(response)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
