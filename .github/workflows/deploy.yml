@@ -39,7 +39,7 @@ jobs:
     - name: Run tests
       run: npm test
       env:
-        BASE_URL: http://localhost:80/action
+        BASE_URL: http://127.0.0.1:80
 
   build-and-deploy:
     needs: test
