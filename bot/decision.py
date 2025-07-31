@@ -47,13 +47,13 @@ def decide_action_type(game_state, player):
     player_pos = player["position"]
     map_data = game_state["map"]
     
+    # Vérifier s'il y a des ennemis à attaquer (priorité la plus haute)
+    if has_enemy_adjacent(player_pos, game_state):
+        return "ATTACK"
+    
     # Vérifier s'il y a des points à collecter à proximité
     if has_collectible_nearby(player_pos, map_data):
         return "COLLECT"
-    
-    # Vérifier s'il y a des ennemis à attaquer
-    if has_enemy_adjacent(player_pos, game_state):
-        return "ATTACK"
     
     # Stratégie smart_bomber : placer des bombes de proximité intelligentes
     if should_place_smart_bomb(player_pos, game_state):
@@ -130,21 +130,13 @@ def should_place_trap(player_pos, game_state):
     # Chercher des points collectables
     collectibles = [obj for obj in objects if obj.get("type") == "collectible"]
     
-    for collectible in collectibles:
-        col_x, col_y = collectible["position"]
-        distance = abs(x - col_x) + abs(y - col_y)
+    # S'il y a des collectibles sur la carte
+    if collectibles:
+        # Vérifier qu'il n'y a pas déjà trop de bombes timer
+        existing_timer_bombs = len([b for b in bombs if b.get("type") == "timer"])
         
-        # Si on est près d'un point collectable (distance 1-2)
-        if 1 <= distance <= 2:
-            # Vérifier qu'il n'y a pas déjà une bombe timer ici
-            existing_timer_bombs = len([
-                b for b in bombs 
-                if b.get("type") == "timer" and 
-                abs(b["position"][0] - col_x) + abs(b["position"][1] - col_y) <= 1
-            ])
-            
-            # Placer une bombe timer si pas déjà de bombe timer près du point
-            return existing_timer_bombs == 0
+        # Placer une bombe timer si pas trop de bombes timer existantes
+        return existing_timer_bombs < 2
     
     return False
 
