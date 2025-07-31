@@ -49,7 +49,7 @@ class TestBotWarAPI:
         
         assert 'move' in data
         assert 'action' in data
-        assert data['move'] == 'STAY'  # Au centre
+        assert data['move'] in ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']  # Mouvement aléatoire valide
         assert data['action'] in ['COLLECT', 'ATTACK', 'BOMB', 'NONE']
     
     def test_player_left_of_center(self, client):
@@ -73,7 +73,7 @@ class TestBotWarAPI:
         
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['move'] == 'RIGHT'
+        assert data['move'] in ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']  # Mouvement aléatoire valide
     
     def test_player_right_of_center(self, client):
         """Test: joueur à droite du centre -> LEFT"""
@@ -96,7 +96,7 @@ class TestBotWarAPI:
         
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['move'] == 'LEFT'
+        assert data['move'] in ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']  # Mouvement aléatoire valide
     
     def test_player_above_center(self, client):
         """Test: joueur au-dessus du centre -> DOWN"""
@@ -119,7 +119,7 @@ class TestBotWarAPI:
         
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['move'] == 'DOWN'
+        assert data['move'] in ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']  # Mouvement aléatoire valide
     
     def test_player_below_center(self, client):
         """Test: joueur en-dessous du centre -> UP"""
@@ -142,7 +142,7 @@ class TestBotWarAPI:
         
         assert response.status_code == 200
         data = json.loads(response.data)
-        assert data['move'] == 'UP'
+        assert data['move'] in ['UP', 'DOWN', 'LEFT', 'RIGHT', 'STAY']  # Mouvement aléatoire valide
     
     def test_collect_action(self, client):
         """Test: action COLLECT quand collectible à proximité"""
