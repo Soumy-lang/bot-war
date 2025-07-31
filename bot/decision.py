@@ -1,3 +1,5 @@
+import random
+
 def decide_action(game_state):
     """
     Décide de l'action du bot basée sur l'état du jeu.
@@ -21,19 +23,9 @@ def decide_action(game_state):
     player = game_state["player"]
     x, y = player["position"]
     
-    center = game_state["map"]["center"]
-    cx, cy = center
-    
-    # Décision de mouvement (logique existante)
-    move = "STAY"
-    if x < cx:
-        move = "RIGHT"
-    elif x > cx:
-        move = "LEFT"
-    elif y < cy:
-        move = "DOWN"
-    elif y > cy:
-        move = "UP"
+    # Mouvement aléatoire : choisir une direction aléatoire
+    moves = ["UP", "DOWN", "LEFT", "RIGHT", "STAY"]
+    move = random.choice(moves)
     
     # Nouvelle logique pour les actions
     action = decide_action_type(game_state, player)
